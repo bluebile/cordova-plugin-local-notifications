@@ -32,6 +32,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.support.v4.app.NotificationCompat.Builder;
+import android.support.v4.app.NotificationCompat;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -117,29 +118,29 @@ public class Receiver extends BroadcastReceiver {
      * Creates the notification.
      */
     @SuppressLint("NewApi")
-	private Builder buildNotification () {
+    private Builder buildNotification () {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), options.getIcon());
         Uri sound   = options.getSound();
 
-        Builder notification = NotificationCompat.Builder(context)
-            .setDefaults(0) // Do not inherit any defaults
-            .setContentTitle(options.getTitle())
-            .setContentText(options.getMessage())
-            .setNumber(options.getBadge())
-            .setTicker(options.getMessage())
-            .setSmallIcon(options.getSmallIcon())
-            .setLargeIcon(icon)
-            .setAutoCancel(options.getAutoCancel())
-            .setOngoing(options.getOngoing());
-        
+        Builder notification = new NotificationCompat.Builder(context)
+                .setDefaults(0) // Do not inherit any defaults
+                .setContentTitle(options.getTitle())
+                .setContentText(options.getMessage())
+                .setNumber(options.getBadge())
+                .setTicker(options.getMessage())
+                .setSmallIcon(options.getSmallIcon())
+                .setLargeIcon(icon)
+                .setAutoCancel(options.getAutoCancel())
+                .setOngoing(options.getOngoing());
+
 
         if (sound != null) {
-        	notification.setSound(sound);
+            notification.setSound(sound);
         }
 
         if (Build.VERSION.SDK_INT > 16) {
-        	notification.setStyle(new Notification.BigTextStyle()
-        		.bigText(options.getMessage()));
+            notification.setStyle(new NotificationCompat.BigTextStyle()
+                    .bigText(options.getMessage()));
         }
 
         setClickEvent(notification);
@@ -152,8 +153,8 @@ public class Receiver extends BroadcastReceiver {
      */
     private Builder setClickEvent (Builder notification) {
         Intent intent = new Intent(context, ReceiverActivity.class)
-            .putExtra(OPTIONS, options.getJSONObject().toString())
-            .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                .putExtra(OPTIONS, options.getJSONObject().toString())
+                .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
         int requestCode = new Random().nextInt();
 
