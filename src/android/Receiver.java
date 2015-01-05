@@ -31,6 +31,7 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -120,17 +121,8 @@ public class Receiver extends BroadcastReceiver {
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(), options.getIcon());
         Uri sound   = options.getSound();
 
-        Builder notification = null;
-
-        android.util.Log.v('INDEX',Build.VERSION.SDK_INT);
-        
-        if (Build.VERSION.SDK_INT > 11) {
-            notification = new android.app.Notification.Builder(context);
-        } else {
-            notification = new android.support.v4.app.NotificationCompat.Builder(context);
-        }
-
-        notification.setDefaults(0) // Do not inherit any defaults
+        Builder notification = NotificationCompat.Builder(context)
+            .setDefaults(0) // Do not inherit any defaults
             .setContentTitle(options.getTitle())
             .setContentText(options.getMessage())
             .setNumber(options.getBadge())
