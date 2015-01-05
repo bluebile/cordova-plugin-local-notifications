@@ -82,6 +82,8 @@
         <source-file src="src/android/Options.java"           target-dir="src/de/appplant/cordova/plugin/localnotification" />
         <source-file src="src/android/Restore.java"           target-dir="src/de/appplant/cordova/plugin/localnotification" />
         <source-file src="src/android/ReceiverActivity.java"  target-dir="src/de/appplant/cordova/plugin/localnotification" />
+
+        <source-file src="src/android/lib/android-support-v4.jar" target-dir="libs" />
     </platform>
 
     <!-- wp8 -->
