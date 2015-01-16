@@ -29,6 +29,8 @@ using WPCordovaClassLib.Cordova.Commands;
 using WPCordovaClassLib.Cordova.JSON;
 
 using De.APPPlant.Cordova.Plugin.LocalNotification;
+using Microsoft.Phone.Scheduler;
+using Newtonsoft.Json;
 
 namespace Cordova.Extension.Commands
 {
@@ -51,37 +53,66 @@ namespace Cordova.Extension.Commands
         /// <summary>
         /// Sets application live tile
         /// </summary>
-        public void add (string jsonArgs)
+        public void add(string jsonArgs)
         {
-            string[] args   = JsonHelper.Deserialize<string[]>(jsonArgs);
-            Options options = JsonHelper.Deserialize<Options>(args[0]);
-            // Application Tile is always the first Tile, even if it is not pinned to Start.
-            ShellTile AppTile = ShellTile.ActiveTiles.First();
-
-            if (AppTile != null)
+            try
             {
-                // Set the properties to update for the Application Tile
-                // Empty strings for the text values and URIs will result in the property being cleared.
-                FlipTileData TileData = CreateTileData(options);
+                string[] args = JsonHelper.Deserialize<string[]>(jsonArgs);
+                Options options = JsonConvert.DeserializeObject<Options>(args[0]);
 
-                AppTile.Update(TileData);
+                // Create Alarm
+                Reminder alarm = new Reminder(options.ID);
+                alarm.Content = options.Message;
+                // Sound is not implemented yet
+                //alarm.Sound = new Uri("/Ringtones/Ring01.wma", UriKind.Relative);
+                // Convert Timestamp to DateTime
+                DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                System.Diagnostics.Debug.WriteLine("Time: " + options.Date / 1000.0);
+                DateTime date = origin.AddSeconds(options.Date);
+                alarm.BeginTime = date.AddHours(1).AddMinutes(1);
+                alarm.ExpirationTime = date.AddHours(12);
+                alarm.RecurrenceType = RecurrenceInterval.None;
 
-                FireEvent("trigger", options.ID, options.JSON);
+                // Add alarm, if not in the past
+                if (alarm.BeginTime > DateTime.Now)
+                {
+                    // Remove old
+                    ScheduledAction oldAlarm = ScheduledActionService.Find(options.ID);
+                    if (oldAlarm != null)
+                    {
+                        ScheduledActionService.Remove(options.ID);
+                    }
+
+                    // ScheduledActionService is limit to 50 notifications 
+                    System.Collections.Generic.List<ScheduledNotification> notifications = ScheduledActionService.GetActions<ScheduledNotification>().ToList();
+                    if (notifications.Count < 50)
+                    {
+                        ScheduledActionService.Add(alarm);
+                    }
+                }
+
+                //FireEvent("trigger", options.ID, options.JSON);
                 FireEvent("add", options.ID, options.JSON);
-            }
 
-            DispatchCommandResult();
+                DispatchCommandResult();
+            } catch (Exception ex) {
+                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+            }
         }
 
         /// <summary>
         /// Clears the application live tile
         /// </summary>
-        public void cancel (string jsonArgs)
+        public void cancel(string jsonArgs)
         {
-            string[] args         = JsonHelper.Deserialize<string[]>(jsonArgs);
+            string[] args = JsonHelper.Deserialize<string[]>(jsonArgs);
             string notificationID = args[0];
 
-            cancelAll(jsonArgs);
+            ScheduledAction alert = ScheduledActionService.Find(notificationID);
+            if (alert != null)
+            {
+                ScheduledActionService.Remove(notificationID);
+            }
 
             FireEvent("cancel", notificationID, "");
         }
@@ -89,28 +120,12 @@ namespace Cordova.Extension.Commands
         /// <summary>
         /// Clears the application live tile
         /// </summary>
-        public void cancelAll (string jsonArgs)
+        public void cancelAll(string jsonArgs)
         {
-            // Application Tile is always the first Tile, even if it is not pinned to Start.
-            ShellTile AppTile = ShellTile.ActiveTiles.First();
-
-            if (AppTile != null)
+            System.Collections.Generic.List<ScheduledNotification> reminders = ScheduledActionService.GetActions<ScheduledNotification>().ToList();
+            foreach (ScheduledNotification reminder in reminders)
             {
-                // Set the properties to update for the Application Tile
-                // Empty strings for the text values and URIs will result in the property being cleared.
-                FlipTileData TileData = new FlipTileData
-                {
-                    Count                = 0,
-                    BackTitle            = "",
-                    BackContent          = "",
-                    WideBackContent      = "",
-                    SmallBackgroundImage = new Uri("appdata:Background.png"),
-                    BackgroundImage      = new Uri("appdata:Background.png"),
-                    WideBackgroundImage  = new Uri("/Assets/Tiles/FlipCycleTileLarge.png", UriKind.Relative),
-                };
-
-                // Update the Application Tile
-                AppTile.Update(TileData);
+                ScheduledActionService.Remove(reminder.Name);
             }
 
             DispatchCommandResult();
