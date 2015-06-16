@@ -60,39 +60,16 @@ namespace Cordova.Extension.Commands
                 string[] args = JsonHelper.Deserialize<string[]>(jsonArgs);
                 Options options = JsonConvert.DeserializeObject<Options>(args[0]);
 
-                // Create Alarm
-                Reminder alarm = new Reminder(options.ID);
-                alarm.Content = options.Message;
-                // Sound is not implemented yet
-                //alarm.Sound = new Uri("/Ringtones/Ring01.wma", UriKind.Relative);
-                // Convert Timestamp to DateTime
+                Reminder reminder = new Reminder(options.ID);
+                reminder.Title = "Lembrete";
+                reminder.Content = options.Message;
                 DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                System.Diagnostics.Debug.WriteLine("Time: " + options.Date / 1000.0);
-                DateTime date = origin.AddSeconds(options.Date);
-                alarm.BeginTime = date.AddHours(1).AddMinutes(1);
-                alarm.ExpirationTime = date.AddHours(12);
-                alarm.RecurrenceType = RecurrenceInterval.None;
-
-                // Add alarm, if not in the past
-                if (alarm.BeginTime > DateTime.Now)
-                {
-                    // Remove old
-                    ScheduledAction oldAlarm = ScheduledActionService.Find(options.ID);
-                    if (oldAlarm != null)
-                    {
-                        ScheduledActionService.Remove(options.ID);
-                    }
-
-                    // ScheduledActionService is limit to 50 notifications 
-                    System.Collections.Generic.List<ScheduledNotification> notifications = ScheduledActionService.GetActions<ScheduledNotification>().ToList();
-                    if (notifications.Count < 50)
-                    {
-                        ScheduledActionService.Add(alarm);
-                    }
-                }
-
-                //FireEvent("trigger", options.ID, options.JSON);
-                FireEvent("add", options.ID, options.JSON);
+                DateTime date = origin.AddSeconds(options.Date).AddHours(-3);
+                reminder.BeginTime = date;
+                reminder.RecurrenceType = RecurrenceInterval.None;
+                reminder.ExpirationTime = DateTime.Today.AddDays(30);
+                //reminder.NavigationUri = new Uri("/MainPage.xaml", UriKind.Relative);
+                ScheduledActionService.Add(reminder);
 
                 DispatchCommandResult();
             } catch (Exception ex) {
