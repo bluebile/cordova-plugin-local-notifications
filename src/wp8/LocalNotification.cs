@@ -63,9 +63,9 @@ namespace Cordova.Extension.Commands
                 Reminder reminder = new Reminder(options.ID);
                 reminder.Title = "Lembrete";
                 reminder.Content = options.Message;
-                DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                DateTime date = origin.AddSeconds(options.Date).AddHours(-3);
-                reminder.BeginTime = date;
+                DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                DateTime date = origin.AddSeconds(options.Date);
+                reminder.BeginTime = date.ToLocalTime();
                 reminder.RecurrenceType = RecurrenceInterval.None;
                 reminder.ExpirationTime = DateTime.Today.AddDays(30);
                 //reminder.NavigationUri = new Uri("/MainPage.xaml", UriKind.Relative);
