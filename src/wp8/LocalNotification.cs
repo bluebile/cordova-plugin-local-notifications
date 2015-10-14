@@ -67,10 +67,10 @@ namespace Cordova.Extension.Commands
                 DateTime date = origin.AddSeconds(options.Date);
                 reminder.BeginTime = date.ToLocalTime();
                 if (options.Repeat == "daily") {
-					reminder.RecurrenceType = RecurrenceInterval.Daily;
-				} else {
-			        reminder.RecurrenceType = RecurrenceInterval.None;
-				}
+                  reminder.RecurrenceType = RecurrenceInterval.Daily;
+				        } else {
+			            reminder.RecurrenceType = RecurrenceInterval.None;
+				        }
                 reminder.ExpirationTime = DateTime.Today.AddDays(30);
                 //reminder.NavigationUri = new Uri("/MainPage.xaml", UriKind.Relative);
                 ScheduledActionService.Add(reminder);
