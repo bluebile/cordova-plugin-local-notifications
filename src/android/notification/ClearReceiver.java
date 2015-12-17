@@ -21,19 +21,24 @@
  * @APPPLANT_LICENSE_HEADER_END@
  */
 
-@interface APPLocalNotificationOptions : NSObject
+package de.appplant.cordova.plugin.notification;
 
-- (id) initWithDict:(NSDictionary*)dict;
+/**
+ * The clear intent receiver is triggered when the user clears a
+ * notification manually. It un-persists the cleared notification from the
+ * shared preferences.
+ */
+public class ClearReceiver extends AbstractClearReceiver {
 
-@property (readonly, getter=id) NSNumber* id;
-@property (readonly, getter=badgeNumber) NSInteger badgeNumber;
-@property (readonly, getter=alertBody) NSString* alertBody;
-@property (readonly, getter=soundName) NSString* soundName;
-@property (readonly, getter=fireDate) NSDate* fireDate;
-@property (readonly, getter=repeatInterval) NSCalendarUnit repeatInterval;
-@property (readonly, getter=userInfo) NSDictionary* userInfo;
+    /**
+     * Called when a local notification was cleared from outside of the app.
+     *
+     * @param notification
+     *      Wrapper around the local notification
+     */
+    @Override
+    public void onClear (Notification notification) {
+        notification.clear();
+    }
 
-// If it's a repeating notification
-- (BOOL) isRepeating;
-
-@end
+}

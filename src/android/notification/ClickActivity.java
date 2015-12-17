@@ -21,19 +21,41 @@
  * @APPPLANT_LICENSE_HEADER_END@
  */
 
-@interface APPLocalNotificationOptions : NSObject
+package de.appplant.cordova.plugin.notification;
 
-- (id) initWithDict:(NSDictionary*)dict;
+/**
+ * The receiver activity is triggered when a notification is clicked by a user.
+ * The activity calls the background callback and brings the launch intent
+ * up to foreground.
+ */
+public class ClickActivity extends AbstractClickActivity {
 
-@property (readonly, getter=id) NSNumber* id;
-@property (readonly, getter=badgeNumber) NSInteger badgeNumber;
-@property (readonly, getter=alertBody) NSString* alertBody;
-@property (readonly, getter=soundName) NSString* soundName;
-@property (readonly, getter=fireDate) NSDate* fireDate;
-@property (readonly, getter=repeatInterval) NSCalendarUnit repeatInterval;
-@property (readonly, getter=userInfo) NSDictionary* userInfo;
+    /**
+     * Called when local notification was clicked by the user. Will
+     * move the app to foreground.
+     *
+     * @param notification
+     *      Wrapper around the local notification
+     */
+    @Override
+    public void onClick(Notification notification) {
+        launchApp();
 
-// If it's a repeating notification
-- (BOOL) isRepeating;
+        if (notification.isRepeating()) {
+            notification.clear();
+        } else {
+            notification.cancel();
+        }
+    }
 
-@end
+    /**
+     * Build notification specified by options.
+     *
+     * @param builder
+     *      Notification builder
+     */
+    public Notification buildNotification (Builder builder) {
+        return builder.build();
+    }
+
+}
