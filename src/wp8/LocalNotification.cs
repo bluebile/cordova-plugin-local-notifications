@@ -53,7 +53,7 @@ namespace Cordova.Extension.Commands
         /// <summary>
         /// Sets application live tile
         /// </summary>
-        public void add(string jsonArgs)
+        public void schedule(string jsonArgs)
         {
             try
             {
