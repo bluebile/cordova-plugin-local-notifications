@@ -40,7 +40,7 @@ namespace De.APPPlant.Cordova.Plugin.LocalNotification
         /// <summary>
         /// The message that is displayed
         /// </summary>
-        [DataMember(IsRequired = false, Name = "message")]
+        [DataMember(IsRequired = false, Name = "text")]
         public string Message { get; set; }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace De.APPPlant.Cordova.Plugin.LocalNotification
         /// <summary>
         /// Tile count
         /// </summary>
-        [DataMember(IsRequired = false, Name = "Date")]
+        [DataMember(IsRequired = false, Name = "at")]
         public double Date { get; set; }
 
         /// <summary>
