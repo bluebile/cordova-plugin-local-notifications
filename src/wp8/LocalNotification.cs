@@ -55,30 +55,38 @@ namespace Cordova.Extension.Commands
         /// </summary>
         public void schedule(string jsonArgs)
         {
-            try
-            {
-                string[] args = JsonHelper.Deserialize<string[]>(jsonArgs);
-                Options options = JsonConvert.DeserializeObject<Options>(args[0]);
+            string[] args = JsonHelper.Deserialize<string[]>(jsonArgs);
+            System.Diagnostics.Debug.WriteLine("JSON: " + jsonArgs);
+            int index = 0;
+            for (index = 0; index < args.Length-1; index++) {
+                Options options = JsonConvert.DeserializeObject<Options>(args[index]);
 
                 Reminder reminder = new Reminder(options.ID);
                 reminder.Title = "Lembrete";
                 reminder.Content = options.Message;
                 DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                 DateTime date = origin.AddSeconds(options.Date);
+                System.Diagnostics.Debug.WriteLine("Date: " + date.ToString("yyyyMMddHHmmss"));
                 reminder.BeginTime = date.ToLocalTime();
-                if (options.Repeat == "daily") {
-                  reminder.RecurrenceType = RecurrenceInterval.Daily;
-				        } else {
-			            reminder.RecurrenceType = RecurrenceInterval.None;
-				        }
+                if (options.Repeat == "daily")
+                {
+                    reminder.RecurrenceType = RecurrenceInterval.Daily;
+                }
+                else
+                {
+                    reminder.RecurrenceType = RecurrenceInterval.None;
+                }
                 reminder.ExpirationTime = DateTime.Today.AddDays(30);
                 //reminder.NavigationUri = new Uri("/MainPage.xaml", UriKind.Relative);
-                ScheduledActionService.Add(reminder);
+                try {
+                    ScheduledActionService.Add(reminder);
 
-                DispatchCommandResult();
-            } catch (Exception ex) {
-                System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
-            }
+                    DispatchCommandResult();
+                } catch (Exception ex) {
+                    System.Diagnostics.Debug.WriteLine("Error: " + ex.Message);
+                }
+            } 
+                
         }
 
         /// <summary>
